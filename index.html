@@ -56,7 +56,7 @@ function dayOfYearKST(date = new Date()) {
 
 async function run() {
   try {
-    const res = await fetch("https://bililleego.github.io/bililleego/quotes.json", { cache: "no-store" });
+    const res = await fetch("https://bilillego.github.io/bilillego/quotes.json", { cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
 
     const quotes = await res.json();
