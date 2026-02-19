@@ -20,21 +20,27 @@ body{
 }
 
 .card{
-  max-width:600px;
-  margin:0 auto;
+  max-width: 620px;
+  margin: 0 auto;
 }
 
 h1{
-  text-align:center;
+  text-align: center;
+  font-size: 18px;
+  opacity: 0.85;
+  margin: 0 0 18px 0;
 }
 
 .quote{
-  text-align:left;
-  line-height:1.7;
-  font-size:22px;
-  white-space:pre-line;
+  text-align: left;
+  font-size: 22px;
+  line-height: 1.75;
+  white-space: pre-line; /* \n 줄바꿈 그대로 */
 }
 
+@media (max-width: 480px){
+  .quote{ font-size: 20px; }
+}
 
 .footer{
   margin-top:40px;
