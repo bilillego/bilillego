@@ -44,36 +44,61 @@ h1{
 </div>
 
 <script>
-document.getElementById("quote").innerText = "불러오는 중…";
+const quoteEl = document.getElementById("quote");
+quoteEl.innerText = "불러오는 중…";
 
 function dayOfYearKST(date = new Date()) {
   const kst = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Seoul" }));
   const start = new Date(kst.getFullYear(), 0, 0);
   const diff = kst - start;
   const oneDay = 1000 * 60 * 60 * 24;
-  return Math.floor(diff / oneDay);
+  return Math.floor(diff / oneDay); // 1~365(366)
+}
+
+// 간단하고 빠른 문자열 해시 (안전/보안용 아님, 섞기용)
+function hashString(str) {
+  let h = 2166136261; // FNV-1a base
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0); // unsigned
+}
+
+// 사용자 고유 키 (같은 기기/브라우저에서 유지)
+function getUserKey() {
+  const KEY = "bilillego_user_key_v1";
+  let v = localStorage.getItem(KEY);
+  if (!v) {
+    // 랜덤 키 생성 후 저장
+    v = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
+    localStorage.setItem(KEY, v);
+  }
+  return v;
 }
 
 async function run() {
   try {
-    const res = await fetch("https://bilillego.github.io/bilillego/quotes.json", { cache: "no-store" });
+    const res = await fetch("./quotes.json", { cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
-
     const quotes = await res.json();
-    if (!Array.isArray(quotes) || quotes.length === 0) throw new Error("quotes.json is empty");
+    if (!Array.isArray(quotes) || quotes.length === 0) throw new Error("quotes.json empty");
 
-    const doy = dayOfYearKST();
-    const index = (doy - 1) % quotes.length;
+    const userKey = getUserKey();
+    const doy = dayOfYearKST(); // 오늘(한국시간)
+    const seed = `${userKey}-${new Date().getFullYear()}-${doy}`;
 
-    document.getElementById("quote").innerText = quotes[index];
+    const index = hashString(seed) % quotes.length;
+    quoteEl.innerText = quotes[index];
   } catch (e) {
     console.error(e);
-    document.getElementById("quote").innerText = "문장을 불러오지 못했어요. (quotes.json 확인)";
+    quoteEl.innerText = "문장을 불러오지 못했어요. (quotes.json 확인)";
   }
 }
 
 run();
 </script>
+
 
 
 </body>
